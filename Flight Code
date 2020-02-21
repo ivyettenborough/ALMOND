@@ -81,9 +81,9 @@ duration = 0
 camera = PiCamera()
 def wait(name0, name1, name2, camera):
     #Calculate the delay to start next image
-    next_im = (datetime.now() + timedelta(seconds = 0.1)).replace(second=0)
+    next_im = (datetime.now() + timedelta(seconds = 60.0)).replace(second=0) # editting delta t to 60 sec - Conk
     delay = (next_im - datetime.now()).seconds
-    sleep(0.1)
+    sleep(60.0) # same as delta t - Conk
 
 #stream configuration
 aScanListNames=["AIN3", "AIN4","AIN5","AIN6","AIN7","AIN8","AIN9"]         #Scan List names to Stream for Radiometer and opto
