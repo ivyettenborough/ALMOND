@@ -1,6 +1,6 @@
 #This is taken from SWARMS-Radiometer/Flight.Code/Flight.Code.Edit
 
-from labjack import ljm
+from labjack import ljm                   # We don't have a labjack so we need to reconfigure ljm. codes
 import datetime
 import os
 import sys
@@ -63,19 +63,18 @@ print(ser.portstr)
 handle = ljm.openS("T7", "ANY", "ANY")
 info = ljm.getHandleInfo(handle)
 name0 = "AIN0" #thermistor
-name1 = "AIN1" #temp1 probe noted by sharpie
+name1 = "AIN1" #temp1 probe noted by sharpie           Figure out what this means
 name2 = "AIN2" #temp2 probe not noted by sharpie
 
-numIterations = 900 #900 = 1 hr
+numIterations = 900 #900 = 1 hr (1 iteration per 4 seconds)
 
-#non-stream configuration
+#non-stream configuration                        Figure out non-stream vs stream configs and WHY?
 rate = 1000 #in ms
 rateUS = rate*1000
 intervalHandle = 0
 ljm.startInterval(intervalHandle, rateUS)
 curIteration = 0
 numSkippedIntervals = 0
-import numpy as np
 lastTick = ljm.getHostTick()
 duration = 0
 camera = PiCamera()
@@ -128,7 +127,7 @@ Payload7 = Payload('SWARMS', 'null', 'Linear_Regulator')
 
 print(Payload2.instrument, Payload2.AIO, Payload3.instrument, Payload3.AIO, Payload6.instrument, Payload6.AIO)
 
-#Timestamp (seconds since January 1, 1970) (byte 2-5)
+#Timestamp (seconds since January 1, 1970) (byte 2-5)          ???????????
 int(time.time()) #seconds since the epoch
 print("Seconds since epoch = ", int(time.time()))
 
@@ -142,35 +141,35 @@ print("Record size = ", sum(os.path.getsize(f) for f in os.listdir('.') if os.pa
 
 
 
-#start loop for non-stream instrumentation
+#start loop for non-stream instrumentation               The Pi-Camera & Radiometer sync?
 for k in range (18000):
     cwd = os.getcwd()
     appStartTime = datetime.now()
     startTimeStr = appStartTime.strftime("%Y/%m/%d %I:%M:%S%p") #Year-Month-Day-Hr-Min-Sec Format
     timeStr = appStartTime.strftime("%Y_%m_%d-%I_%M_%S%p")
-    fileName = timeStr + "-%s-Metadata.txt"%("Radiometer") + str(k)
+    fileName = timeStr + "-%s-Metadata.txt"%("Radiometer") + str(k)                   
     filePath = os.path.join(cwd, fileName) #Current Work Directory will be in /downloads
     fileNameAdded = fileName + '{counter:03d}' #:03d counter will allow up to 999 loops before overwrite
     filePathAdded = os.path.join(cwd, fileNameAdded)
     #All data except stream (MetaData) will go into .txt
     #..._aData is going to be a seperate csv file for Pandas to operate on
-    fileName_aData = timeStr + "-%s-Stream.csv"%("Radiometer") + str(k)
+    fileName_aData = timeStr + "-%s-Stream.csv"%("Radiometer") + str(k)             
     filePath_aData = os.path.join(cwd, fileName_aData)
     fileNameAdded_aData = fileName_aData + '{counter:03d}' 
     filePathAdded_aData = os.path.join(cwd, fileNameAdded_aData)
     while curIteration < numIterations:
         for i, filename in enumerate(camera.capture_continuous(filePath + 'image{counter:003d}.jpg')):  
            #repeat file set up for appending files to new -- after each run-through
-           fileName = timeStr + "-%s-Metadata.txt"%("Radiometer") + str(k)
+           fileName = timeStr + "-%s-Metadata.txt"%("Radiometer") + str(k)                           
            filePath = os.path.join(cwd, fileName) #Current Work Directory will be in /downloads
            fileNameAdded = fileName + '{counter:03d}' #:03d counter will allow up to 999 loops before overwrite
            filePathAdded = os.path.join(cwd, fileNameAdded)
-           fileName_aData = timeStr + "-%s-Stream.csv"%("Radiometer") + str(k)
+           fileName_aData = timeStr + "-%s-Stream.csv"%("Radiometer") + str(k)                  
            filePath_aData = os.path.join(cwd, fileName_aData)
            fileNameAdded_aData = fileName_aData + '{counter:03d}' 
            filePathAdded_aData = os.path.join(cwd, fileNameAdded_aData)
            with io.open(filePath, 'w') as f:   #, 'a'
-               try:
+               try:                                         ### calls all instruments and records data for each loop
                    k += 1
                    print(k)
                    c = hashlib.md5(open(filePath,'rb').read()).hexdigest() #calculate checksum in file from looped filepath writing
